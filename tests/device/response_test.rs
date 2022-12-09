@@ -22,3 +22,12 @@ pub fn read_stores_setting() {
     read_response("$13=abc", &mut device_info).unwrap();
     assert_eq!(device_info.settings().get_setting(&13).unwrap().value(), "abc")
 }
+
+#[test]
+pub fn read_ok() {
+    let mut device_info = DeviceInfo::from("test").unwrap();
+    device_info.set_ready_for_command(false);
+    assert_eq!(device_info.ready_for_command(), false);
+    read_response("ok", &mut device_info).unwrap();
+    assert_eq!(device_info.ready_for_command(), true);
+}

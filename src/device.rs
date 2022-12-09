@@ -17,6 +17,7 @@ pub struct DeviceInfo {
     last_message: Option<Message>,
     last_echo_message: Option<EchoMessage>,
     settings: DeviceSettings,
+    ready_for_command: bool,
 }
 
 
@@ -32,6 +33,7 @@ impl DeviceInfo {
             last_message: None,
             last_echo_message: None,
             settings: DeviceSettings::new(),
+            ready_for_command: true,
         })
     }
 
@@ -195,6 +197,15 @@ impl DeviceInfo {
     #[must_use]
     pub fn settings(&self) -> &DeviceSettings {
         &self.settings
+    }
+
+    pub fn set_ready_for_command(&mut self, ready: bool) {
+        self.ready_for_command = ready;
+    }
+    
+    #[must_use]
+    pub fn ready_for_command(&self) -> bool {
+        self.ready_for_command
     }
 }
 

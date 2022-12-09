@@ -1,4 +1,4 @@
-use std::{collections::HashMap, sync::{Arc, Mutex, mpsc::{Sender, self, Receiver}}, thread::{JoinHandle, self}, time::Duration};
+use std::{collections::HashMap, sync::{Arc, Mutex, mpsc::{Sender, self, Receiver}}, thread::{JoinHandle, self, sleep}, time::Duration};
 
 use log::{error, debug};
 
@@ -115,10 +115,38 @@ impl DeviceHandle {
     }
 
     pub fn write(&self, command: &str) -> Result<(), String> {
+        let mut iterations = 0;
+        loop {
+            if iterations > 5_000 {
+                panic!("Failed to receive 'ok'");
+            }
+            let current_device_info = self.get_device_info();
+
+            if current_device_info.ready_for_command() {
+                break;
+            } else {
+                iterations += 1;
+                sleep(Duration::from_millis(10));
+            }
+        }
+
         match &self.tx_write {
             Some(tx) => {
                 match tx.send(command.to_string()) {
-                    Ok(_) => Ok(()),
+                    Ok(_) => {
+                        match command.chars().next() {
+                            Some('$') | Some('%') | Some('\0') => (),
+                            // Some('?') => (),
+                            // Some('~') => (),
+                            // Some('!') => (),
+                            None => (),
+                            _ => {
+                                let mut current_device_info = self.device_info.lock().unwrap();
+                                current_device_info.set_ready_for_command(false);
+                            }
+                        }
+                        Ok(())
+                    },
                     Err(_) => Err(format!("Cannot write command to \"{}\"", self.device_id).to_string())
                 }
             }

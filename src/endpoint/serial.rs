@@ -87,8 +87,7 @@ impl SerialEndpoint {
         let port_name = self.port_name.clone();
         let baud_rate = self.baud_rate;
 
-        self.serial_thread = Some(thread::spawn(move || {            
-
+        self.serial_thread = Some(thread::spawn(move || {
             // open a new serial port
             // stop process if serial port could not be opened
             let mut serial_port = match serialport::new(port_name.clone(), baud_rate).timeout(Duration::from_millis(1)).open() {

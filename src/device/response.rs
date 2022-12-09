@@ -28,7 +28,7 @@ pub mod parser;
 
 /// Reads any response and updates the device info accordingly
 pub fn read_response(response: &str, device_info: &mut DeviceInfo) -> Result<(), String> {
-    debug!("Parse response: {}", response);
+    debug!("RESPONSE: {}", response);
     if MachineInfo::is_response(response) {
         match MachineInfo::from(response) {
             Ok(info) => {
@@ -65,6 +65,9 @@ pub fn read_response(response: &str, device_info: &mut DeviceInfo) -> Result<(),
         read_setting_response(response, device_info)
     } else if is_firmware_info_response(response) {
         read_firmware_info_response(response, device_info)
+    } else if response == "ok" {
+        device_info.set_ready_for_command(true);
+        Ok(())
     } else {
         Err(format!("Unknown response format: \"{}\"", response))
     }
