@@ -210,7 +210,13 @@ impl DeviceService {
 
     pub fn write_device_command(&mut self, device_id : &String, command: &str) -> Result<(), String> {
         match self.device_handles.get(device_id) {
-            Some(handle) => handle.write(command),
+            Some(handle) => {
+                if command.ends_with("\n") {
+                    handle.write(command)
+                } else {
+                    handle.write(format!("{}\n", command).as_str())
+                }
+            },
             None => Err("Device not found".to_string()),
         }        
     }
