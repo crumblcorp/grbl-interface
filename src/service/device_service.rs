@@ -135,7 +135,8 @@ impl DeviceHandle {
                 match tx.send(command.to_string()) {
                     Ok(_) => {
                         match command.chars().next() {
-                            Some('$') | Some('%') | Some('\0') => (),
+                            Some('%') | Some('\0') => (),
+                            // Some('$') => (),
                             // Some('?') => (),
                             // Some('~') => (),
                             // Some('!') => (),
